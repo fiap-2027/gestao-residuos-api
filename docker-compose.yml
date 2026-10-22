@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+
+  oracle-db:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: residuos-oracle-db
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_SYS_PASSWORD:-OraclePwd123}
+      APP_USER: ${DB_USERNAME:-residuos_user}
+      APP_USER_PASSWORD: ${DB_PASSWORD:-residuos_pass}
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    networks:
+      - residuos-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: residuos-api
+    depends_on:
+      oracle-db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:oracle:thin:@//oracle-db:1521/XEPDB1
+      DB_USERNAME: ${DB_USERNAME:-residuos_user}
+      DB_PASSWORD: ${DB_PASSWORD:-residuos_pass}
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET no arquivo .env}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-3600000}
+    ports:
+      - "8080:8080"
+    networks:
+      - residuos-network
+
+networks:
+  residuos-network:
+    driver: bridge
+
+volumes:
+  oracle-data:
