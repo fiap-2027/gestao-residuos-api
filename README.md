@@ -112,3 +112,21 @@ mvn test
 Inclui teste de contexto Spring e testes unitários (`DescarteServiceTest`)
 que validam a validação de descarte, geração de notificação de destinação
 incorreta e a geração automática de coleta ao cruzar o limite de ocupação.
+
+## Collection do Postman
+
+O arquivo `postman/gestao-residuos-api.postman_collection.json` contém **todos os endpoints**,
+organizados em pastas numeradas, com testes automáticos de status em cada requisição.
+
+1. No Postman: **Import** → selecione o arquivo.
+2. Rode a pasta **1. Autenticacao** primeiro: os tokens ADMIN e USER são salvos sozinhos.
+3. Para rodar tudo de uma vez: botão **Run collection** (as pastas devem rodar na ordem).
+
+Pela linha de comando (com a API no ar):
+
+```
+npx newman run postman/gestao-residuos-api.postman_collection.json
+```
+
+> Observação: no PowerShell, parâmetros `-D` do Maven precisam de aspas,
+> ex.: `mvn clean compile "-Dmaven.compiler.failOnError=true"`.
